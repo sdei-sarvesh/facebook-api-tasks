@@ -27,14 +27,14 @@ npm start
 
 Now browse to the app at [`localhost:5000`][local-app-url].
 
-###How to test application
+### How to test application
 Step 1- authenticate user with facebook account.
 Step 2- Add keyword by clicking link from top right corner in profile page.
 Step 3- Go to the Fb Fan Pages by clicking on link from profile page.
 Step 4- Deleting comment by clicking delete comment button from table and Based on Given keywords, comments will be removed from fanpage.
 Step 5 - Once comments deleted then it will be redirected to the success pages.
 
-###Automatically remove comment
+### Automatically remove comment
 Once steps 3 completed then automatically comments will be deleted from fan pages based on keywords by scheduler script executing in backend process.
 
 ## Contact
