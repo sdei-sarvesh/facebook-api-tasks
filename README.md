@@ -10,7 +10,7 @@ To get you started you can simply clone the `facebook-api-tasks` repository and 
 If you would like to download the code and try it for yourself:
 
 1. Clone the repo: `https://github.com/sdei-sarvesh/facebook-api-tasks.git`
-2. Install packages: `npm install`
+2. Install Dependencies packages: `npm install`
 3. Change out the database configuration in config/database.js
 4. Change out auth keys in config/auth.js
 5. Launch: `node server.js`
@@ -18,29 +18,12 @@ If you would like to download the code and try it for yourself:
 
 Now browse to the app at [`localhost:5000`][local-app-url].
 
-### Install Dependencies
-
-We have node dependencies in this project
-
-* We get the node packages we depend upon via `npm`, the [Node package manager][npm].
-
-We have preconfigured `npm` to automatically install `node_module` so you can simply do:
-
-```
-npm install
-```
-
-After installing the node_modules you need to need to start you application.
-
-
 ### Run the Application
 
 We have preconfigured the project with a simple development web server. The simplest way to start
 this server is:
 
-```
 npm start
-```
 
 Now browse to the app at [`localhost:5000`][local-app-url].
 
@@ -53,7 +36,6 @@ Step 5 - Once comments deleted then it will be redirected to the success pages.
 
 ###Automatically remove comment
 Once steps 3 completed then automatically comments will be deleted from fan pages based on keywords by scheduler script executing in backend process.
-
 
 ## Contact
 
