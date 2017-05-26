@@ -1,24 +1,22 @@
 # facebook-api-tasks
 Delete a facebook fanpage comment based on certain negative keywords
+
 ## Getting Started
 
 To get you started you can simply clone the `facebook-api-tasks` repository and install the dependencies:
 
 ### Prerequisites
 
-You need git to clone the `facebook-api-tasks` repository. You can get git from [here][git].
+If you would like to download the code and try it for yourself:
 
-We also use a number of Node.js tools to initialize and test `facebook-api-tasks`. You must have Node.js
-and its package manager (npm) installed. You can get them from [here][node].
+1. Clone the repo: `https://github.com/sdei-sarvesh/facebook-api-tasks.git`
+2. Install packages: `npm install`
+3. Change out the database configuration in config/database.js
+4. Change out auth keys in config/auth.js
+5. Launch: `node server.js`
+6. Visit in your browser at: `http://localhost:5000`
 
-### Clone `facebook-api-tasks`
-
-Clone the `facebook-api-tasks` repository using git:
-
-```
-git clone https://github.com/ybiinc/facebook-api-tasks.git
-cd facebook-api-tasks
-```
+Now browse to the app at [`localhost:5000`][local-app-url].
 
 ### Install Dependencies
 
