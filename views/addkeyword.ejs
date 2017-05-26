@@ -1,0 +1,41 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Facebook Fanpage</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+	<style>
+		body 		{ padding-top:80px; word-wrap:break-word; }
+	</style>
+</head>
+<body>
+<div class="container">
+<h1><span class="fa fa-anchor"></span> Add Keyword</h1>
+	<div class="page-header text-right">	
+		<a href="/profile" class="btn btn-primary btn-sm">Profile</a>	
+		<a href="/logout" class="btn btn-default btn-sm">Logout</a>	
+	</div>
+<div class="row">		
+		<!-- FACEBOOK INFORMATION -->
+		<div class="col-sm-12">
+			<div class="well">
+
+	
+
+	<!-- Keyword FORM -->
+	<form action="/savekeyword/<%= fbId %>" method="post">
+		<div class="form-group">
+			<label>Add Keyword(comma ',' separated)</label>
+			<input type="text" class="form-control" name="keyword">
+		</div>
+		<button type="submit" class="btn btn-warning btn-lg">Add</button>
+	</form>
+
+	
+
+</div>
+</div>
+</div>
+</body>
+</html>
