@@ -30,8 +30,7 @@ module.exports = function (passport) {
             done(err, user);
         });
     });
-
-    // =========================================================================
+ // =========================================================================
     // LOCAL LOGIN =============================================================
     // =========================================================================
     // we are using named strategies since we have one for login and one for signup
@@ -66,7 +65,7 @@ module.exports = function (passport) {
 
         }));
 
-    // =========================================================================
+        // =========================================================================
     // FACEBOOK ================================================================
     // =========================================================================
     passport.use(new FacebookStrategy({
@@ -74,14 +73,13 @@ module.exports = function (passport) {
         // pull in our app id and secret from our auth.js file
         clientID: configAuth.facebookAuth.clientID,
         clientSecret: configAuth.facebookAuth.clientSecret,
-        // scope: configAuth.facebookAuth.scope,
+        scope: configAuth.facebookAuth.scope,
         callbackURL: configAuth.facebookAuth.callbackURL
 
     },
 
         // facebook will send back the token and profile
-        function (token, refreshToken, profile, done) {
-
+        function (token, refreshToken, profile, done) {console.log(profile);
             // asynchronous
             process.nextTick(function () {
 
@@ -103,14 +101,15 @@ module.exports = function (passport) {
                             , "client_id": configAuth.facebookAuth.clientID
                             , "client_secret": configAuth.facebookAuth.clientSecret
                         }, function (err, facebookRes) {
-                            // if there is no user found with that facebook id, create them
+                            console.log('facebookRes===',facebookRes);
+ // if there is no user found with that facebook id, create them
                             var newUser = new User();
 
                             // set all of the facebook information in our user model
                             newUser.facebook.id = profile.id; // set the users facebook id                   
                             newUser.facebook.token = facebookRes.access_token; // we will save the token that facebook provides to the user                    
-                            newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
-                            newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+                            newUser.facebook.name = profile.displayName; // look at the passport user profile to see how names are returned
+//                            newUser.facebook.email = profile.emails.value; // facebook can return multiple emails so we'll take the first
 
                             // save our user to the database
                             newUser.save(function (err) {
@@ -130,3 +129,4 @@ module.exports = function (passport) {
         }));
 
 };
+                                                                                                                              132,1         Bot
