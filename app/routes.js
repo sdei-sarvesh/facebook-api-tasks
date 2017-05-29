@@ -241,7 +241,7 @@ module.exports = function (app, passport) {
             function (callback) {
                 //get fan page posts
                 graph.get(req.params.id + "/feed?access_token=" + user_access_token, function (err, posts) {
-                    if (fbpost.length > 0) {
+                    if (posts.data) {
                         var fbpost = posts.data;
                         if (fbpost.length > 0) {
                             fbpost.forEach(function (res) {
