@@ -241,32 +241,34 @@ module.exports = function (app, passport) {
             function (callback) {
                 //get fan page posts
                 graph.get(req.params.id + "/feed?access_token=" + user_access_token, function (err, posts) {
-                    var fbpost = posts.data;
                     if (fbpost.length > 0) {
-                        fbpost.forEach(function (res) {
-                            Post.find({ postId: res.id }, function (err, postRecord) {
-                                if (err) {
-                                    console.log('err');
-                                } else {
-                                    if (!postRecord.length > 0) {
-                                        var newPost = new Post();
-                                        newPost.fbPageId = req.params.id;
-                                        newPost.post = res.message; // set the facebook page                   
-                                        newPost.postId = res.id; // Set facebook page id 
-                                        newPost.created_time = res.created_time; // Set facebook page id                   
+                        var fbpost = posts.data;
+                        if (fbpost.length > 0) {
+                            fbpost.forEach(function (res) {
+                                Post.find({ postId: res.id }, function (err, postRecord) {
+                                    if (err) {
+                                        console.log('err');
+                                    } else {
+                                        if (!postRecord.length > 0) {
+                                            var newPost = new Post();
+                                            newPost.fbPageId = req.params.id;
+                                            newPost.post = res.message; // set the facebook page                   
+                                            newPost.postId = res.id; // Set facebook page id 
+                                            newPost.created_time = res.created_time; // Set facebook page id                   
 
-                                        // save our user to the database
-                                        newPost.save(function (err) {
-                                            if (err) {
-                                                //console.log(err)
-                                            } else {
-                                                //console.log('success');
-                                            }
-                                        });
+                                            // save our user to the database
+                                            newPost.save(function (err) {
+                                                if (err) {
+                                                    //console.log(err)
+                                                } else {
+                                                    //console.log('success');
+                                                }
+                                            });
+                                        }
                                     }
-                                }
+                                });
                             });
-                        });
+                        }
                     }
                     callback();
                 });
@@ -283,34 +285,38 @@ module.exports = function (app, passport) {
             },
             function (callback) {
                 console.log(page_access_token);
-                postId.forEach(function (res) {
-                    graph.get(res.postId + "/comments?access_token=" + user_access_token, function (err, comments) {
-                        // returns the post id
-                        var fbpostComment = comments.data;
-                        //console.log(fbpostComment);
-                        if (fbpostComment) {
-                            fbpostComment.forEach(function (res) {
-                                var string1 = res.message;
-                                var string = string1.toLowerCase();
-                                if (keywords.length > 0) {
-                                    keywords.forEach(function (keyword) {
-                                        var userKey = keyword.keyword;
-                                        var keywordString = userKey.toLowerCase();
-                                        var regex = new RegExp(keywordString.trim(), 'gi');
-                                        if (regex.test(string)) {
-                                            console.log('Matched==>', string);
-                                            graph.del(res.id + "?access_token=" + page_access_token, function (err, res) {
-                                                console.log(res); // {data:true}/{data:false} 
+                if (postId.length > 0) {
+                    postId.forEach(function (res) {
+                        graph.get(res.postId + "/comments?access_token=" + user_access_token, function (err, comments) {
+                            // returns the post id
+                            if (comments.data) {
+                                var fbpostComment = comments.data;
+                                //console.log(fbpostComment);
+                                if (fbpostComment) {
+                                    fbpostComment.forEach(function (res) {
+                                        var string1 = res.message;
+                                        var string = string1.toLowerCase();
+                                        if (keywords.length > 0) {
+                                            keywords.forEach(function (keyword) {
+                                                var userKey = keyword.keyword;
+                                                var keywordString = userKey.toLowerCase();
+                                                var regex = new RegExp(keywordString.trim(), 'gi');
+                                                if (regex.test(string)) {
+                                                    console.log('Matched==>', string);
+                                                    graph.del(res.id + "?access_token=" + page_access_token, function (err, res) {
+                                                        console.log(res); // {data:true}/{data:false} 
+                                                    });
+                                                } else {
+                                                    console.log('Not matched==>', string);
+                                                }
                                             });
-                                        } else {
-                                            console.log('Not matched==>', string);
                                         }
                                     });
                                 }
-                            });
-                        }
+                            }
+                        });
                     });
-                });
+                }
                 callback();
             },
         ], function (err) {
@@ -342,7 +348,7 @@ function isLoggedIn(req, res, next) {
 }
 
 
-//auto schedular script run to remove comments from fanpages  
+//auto schedular script run to remove comments from fanpages 
 function autoRemoveComments() {
     var keywords = {};
     Page.find({}, function (err, pages) {
@@ -351,13 +357,14 @@ function autoRemoveComments() {
         } else {
             if (pages.length > 0) {
                 pages.forEach(function (res) {
+                    var graph = require('fbgraph');
                     var page_access_token = res.access_token;
                     var pageId = res.fbPageId;
                     var userFbId = res.fbId;
-                    var graph = require('fbgraph');
                     var fanPageLists = {};
                     var user_access_token;
-
+                    var page_access_token;
+                    var keywords = {};
                     async.series([//you can use "async.series" as well
                         function (callback) {
                             //get access token
@@ -365,10 +372,12 @@ function autoRemoveComments() {
                                 if (err) {
                                     callback(err);
                                 } else {
+                                    //console.log(userKeyword);
                                     keywords = userKeyword;
                                     callback();
                                 }
                             });
+
                         },
                         function (callback) {
                             //get access token
@@ -385,31 +394,35 @@ function autoRemoveComments() {
                         function (callback) {
                             //get fan page posts
                             graph.get(pageId + "/feed?access_token=" + user_access_token, function (err, posts) {
-                                var fbpost = posts.data;
-                                fbpost.forEach(function (res) {
-                                    Post.find({ postId: res.id }, function (err, postRecord) {
-                                        if (err) {
-                                            console.log('err');
-                                        } else {
-                                            if (!postRecord.length > 0) {
-                                                var newPost = new Post();
-                                                newPost.fbPageId = pageId;
-                                                newPost.post = res.message; // set the facebook page                   
-                                                newPost.postId = res.id; // Set facebook page id 
-                                                newPost.created_time = res.created_time; // Set facebook page id                   
+                                if (posts.data) {
+                                    var fbpost = posts.data;
+                                    if (fbpost.length > 0) {
+                                        fbpost.forEach(function (res) {
+                                            Post.find({ postId: res.id }, function (err, postRecord) {
+                                                if (err) {
+                                                    console.log('err');
+                                                } else {
+                                                    if (!postRecord.length > 0) {
+                                                        var newPost = new Post();
+                                                        newPost.fbPageId = req.params.id;
+                                                        newPost.post = res.message; // set the facebook page                   
+                                                        newPost.postId = res.id; // Set facebook page id 
+                                                        newPost.created_time = res.created_time; // Set facebook page id                   
 
-                                                // save our user to the database
-                                                newPost.save(function (err) {
-                                                    if (err) {
-                                                        //console.log(err)
-                                                    } else {
-                                                        //console.log('success');
+                                                        // save our user to the database
+                                                        newPost.save(function (err) {
+                                                            if (err) {
+                                                                //console.log(err)
+                                                            } else {
+                                                                //console.log('success');
+                                                            }
+                                                        });
                                                     }
-                                                });
-                                            }
-                                        }
-                                    });
-                                });
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
                                 callback();
                             });
                         },
@@ -424,36 +437,38 @@ function autoRemoveComments() {
                             });
                         },
                         function (callback) {
-                            //console.log(page_access_token);
-                            postId.forEach(function (res) {
-                                graph.get(res.postId + "/comments?access_token=" + user_access_token, function (err, comments) {
-                                    // returns the post id
-                                    var fbpostComment = comments.data;
-                                    //console.log(fbpostComment);
-                                    if (fbpostComment.length > 0) {
-                                        fbpostComment.forEach(function (res) {
-                                            var string1 = res.message;
-                                            var string = string1.toLowerCase();
-                                            if (keywords.length > 0) {
-                                                keywords.forEach(function (keyword) {
-                                                    var userKey = keyword.keyword;
-                                                    var keywordString = userKey.toLowerCase();
-                                                    var regex = new RegExp(keywordString.trim(), 'gi');
-                                                    if (regex.test(string)) {
-                                                        console.log('Matched==>', string);
-                                                        graph.del(res.id + "?access_token=" + page_access_token, function (err, res) {
-                                                            console.log(res); // {data:true}/{data:false} 
+                            if (postId.length > 0) {
+                                postId.forEach(function (res) {
+                                    graph.get(res.postId + "/comments?access_token=" + user_access_token, function (err, comments) {
+                                        // returns the post id
+                                        if (comments.data) {
+                                            var fbpostComment = comments.data;
+                                            //console.log(fbpostComment);
+                                            if (fbpostComment) {
+                                                fbpostComment.forEach(function (res) {
+                                                    var string1 = res.message;
+                                                    var string = string1.toLowerCase();
+                                                    if (keywords.length > 0) {
+                                                        keywords.forEach(function (keyword) {
+                                                            var userKey = keyword.keyword;
+                                                            var keywordString = userKey.toLowerCase();
+                                                            var regex = new RegExp(keywordString.trim(), 'gi');
+                                                            if (regex.test(string)) {
+                                                                console.log('Matched==>', string);
+                                                                graph.del(res.id + "?access_token=" + page_access_token, function (err, res) {
+                                                                    console.log(res); // {data:true}/{data:false} 
+                                                                });
+                                                            } else {
+                                                                console.log('Not matched==>', string);
+                                                            }
                                                         });
-                                                    } else {
-                                                        console.log('Not matched==>', string);
                                                     }
                                                 });
                                             }
-
-                                        });
-                                    }
+                                        }
+                                    });
                                 });
-                            });
+                            }
                             callback();
                         },
                     ], function (err) {
@@ -468,5 +483,6 @@ function autoRemoveComments() {
         }
     });
 }
+
 
 setInterval(autoRemoveComments, 60 * 1000);
